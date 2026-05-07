@@ -1,0 +1,20 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+   - /opt/buttercup-data/mailsv/*.log
+   - /opt/buttercup-data/vendor_sales/*.csv
+   - /opt/buttercup-data/www1/*.log
+   - /opt/buttercup-data/www2/*.log
+   - /opt/buttercup-data/www3/*.log
+
+output.elasticsearch:
+  hosts: ["https://127.0.0.1:9200"]
+  protocol: https
+  username: admin
+  password: admin
+  ssl.certificate_authorities:
+   - /etc/filebeat/certs/root-ca.pem
+  ssl.certificate: "/etc/filebeat/certs/wazuh-server.pem"
+  ssl.key: "/etc/filebeat/certs/wazuh-server-key.pem"
+
