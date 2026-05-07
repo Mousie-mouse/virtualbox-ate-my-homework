@@ -300,6 +300,191 @@ The goal is to help future Linux users avoid losing hours to undocumented assump
 
 ---
 
+# Evidence Gallery
+
+## Shared Folder Enumeration
+
+Verified that VirtualBox shared folders were mounted and visible from inside the VM.
+
+### Commands
+
+```bash
+find /media/sf_buttercup-shared -type f | head -50
+ls -lah /media/sf_buttercup-shared
+ls -lah /media/sf_buttercup-shared/mailsv
+ls -lah /media/sf_buttercup-shared/mailsv/
+```
+
+### Assets
+
+- `assets/check-paths.png`
+- `assets/check-dmesg.png`
+- `assets/check-journalctl.png`
+
+---
+
+## Permission and Mount Behavior Problems
+
+Observed inconsistent filesystem access behavior between normal user context and elevated execution.
+
+### Commands
+
+```bash
+find /opt/buttercup-data -type f
+sudo find /opt/buttercup-data -type f
+
+ls -lah /opt/buttercup-data/mailsv
+sudo ls -lah /opt/buttercup-data/mailsv
+```
+
+### Assets
+
+- `assets/missing-permission.png`
+- `assets/correct-file-accurate-path.png`
+- `assets/alignpaths.png`
+
+---
+
+## Filebeat Configuration Validation
+
+Validated syntax and tested runtime output behavior.
+
+### Commands
+
+```bash
+sudo /usr/share/filebeat/bin/filebeat test config -c /home/wazuh-user/ingest.yml
+
+sudo /usr/share/filebeat/bin/filebeat test output \
+-c /home/wazuh-user/ingest.yml
+```
+
+### Observed Behavior
+
+- Configuration parsed successfully
+- Output tests failed against Logstash
+- Connection refused on localhost:5044
+
+### Assets
+
+- `assets/Config-OK-different-error.png`
+- `assets/connection-issue.png`
+- `assets/5044-no-listening(1).png`
+
+---
+
+## Architecture Mismatch Discovery
+
+Confirmed that the OVA architecture differed from the assumptions in the course material.
+
+### Commands
+
+```bash
+sudo systemctl status logstash
+sudo ss -lntp | grep 5044
+```
+
+### Findings
+
+- Logstash service absent
+- No listener on TCP/5044
+- Wazuh OVA was using Elasticsearch/OpenSearch directly
+
+### Assets
+
+- `assets/architecture-mismatch.png`
+- `assets/Elastic-not-logstash.png`
+
+---
+
+## Elasticsearch/OpenSearch Validation
+
+Validated active Wazuh indices and ingestion behavior.
+
+### Commands
+
+```bash
+sudo curl -k -u admin:admin \
+'https://127.0.0.1:9200/_cat/indices?v'
+```
+
+### Findings
+
+- Indices existed
+- Wazuh alerts populated
+- Partial ingestion occurred
+
+### Assets
+
+- `assets/final-ingestion-attempt-wazuh-discovery.png`
+
+---
+
+## Filebeat Runtime Instability
+
+Filebeat frequently appeared alive while simultaneously failing ingestion or crashing.
+
+### Commands
+
+```bash
+grep -Ei "error|harvester|publish|logstash|5044|panic|failed|events" \
+/tmp/filebeat-run.log
+```
+
+### Observed Behavior
+
+- Harvester activity persisted
+- Monitoring counters updated
+- Internal Golang panics occurred
+- Publisher/runtime failures appeared intermittently
+
+### Assets
+
+- `assets/alive-but-no-ingestion.png`
+- `assets/harvester-error.png`
+- `assets/filebeat-crash.png`
+- `assets/final-ingestion-failure.png`
+
+---
+
+## Golang Panic / Stacktrace Failures
+
+Repeated low-level crashes produced Golang runtime stack traces rather than clean application-layer errors.
+
+### Assets
+
+- `assets/Go-panic-crash.png`
+- `assets/Gostacktracecrash.png`
+
+---
+
+## Native Storage Migration
+
+To eliminate VirtualBox shared-folder behavior as a variable, datasets were moved into native VM storage.
+
+### Commands
+
+```bash
+sudo mkdir -p /opt/buttercup-data
+
+sudo cp -r /media/sf_buttercup-shared/* \
+/opt/buttercup-data/
+
+sudo find /opt/buttercup-data -type f
+```
+
+### Findings
+
+- Stability improved somewhat
+- File readability became more consistent
+- Crashes still occurred intermittently
+
+### Assets
+
+- `assets/final-ingestion-attempt.png`
+- `assets/Filebeat-version-stablity.png`
+
+---
+
 # Future Work
 
 - Reproduce on VMware
@@ -313,5 +498,5 @@ The goal is to help future Linux users avoid losing hours to undocumented assump
 
 # Author
 
-**Mar Carter**  
+**Mar Lannen** *~formerly Carter* 
 GitHub: https://github.com/Mousie-mouse
