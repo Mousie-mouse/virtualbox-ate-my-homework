@@ -300,188 +300,169 @@ The goal is to help future Linux users avoid losing hours to undocumented assump
 
 ---
 
-# Evidence Gallery
+# Evidence and Screenshots
 
-## Shared Folder Enumeration
+## Shared Folder Discovery and Validation
 
-Verified that VirtualBox shared folders were mounted and visible from inside the VM.
+Confirmed that the VirtualBox shared folder was mounted and visible to the guest VM:
 
-### Commands
+![Shared Folder Validation](assets/shared-folder-validation.png)
+
+Commands used:
 
 ```bash
 find /media/sf_buttercup-shared -type f | head -50
 ls -lah /media/sf_buttercup-shared
-ls -lah /media/sf_buttercup-shared/mailsv
-ls -lah /media/sf_buttercup-shared/mailsv/
 ```
-
-### Assets
-
-- `assets/check-paths.png`
-- `assets/check-dmesg.png`
-- `assets/check-journalctl.png`
-
----
-
-## Permission and Mount Behavior Problems
-
-Observed inconsistent filesystem access behavior between normal user context and elevated execution.
-
-### Commands
-
-```bash
-find /opt/buttercup-data -type f
-sudo find /opt/buttercup-data -type f
-
-ls -lah /opt/buttercup-data/mailsv
-sudo ls -lah /opt/buttercup-data/mailsv
-```
-
-### Assets
-
-- `assets/missing-permission.png`
-- `assets/correct-file-accurate-path.png`
-- `assets/alignpaths.png`
 
 ---
 
 ## Filebeat Configuration Validation
 
-Validated syntax and tested runtime output behavior.
+Validated Filebeat configuration syntax and inspected ingest paths:
 
-### Commands
+![Filebeat Config Validation](assets/filebeat-config-validation.png)
+
+Commands used:
 
 ```bash
 sudo /usr/share/filebeat/bin/filebeat test config -c /home/wazuh-user/ingest.yml
-
-sudo /usr/share/filebeat/bin/filebeat test output \
--c /home/wazuh-user/ingest.yml
+sudo cat /home/wazuh-user/ingest.yml
 ```
-
-### Observed Behavior
-
-- Configuration parsed successfully
-- Output tests failed against Logstash
-- Connection refused on localhost:5044
-
-### Assets
-
-- `assets/Config-OK-different-error.png`
-- `assets/connection-issue.png`
-- `assets/5044-no-listening(1).png`
 
 ---
 
-## Architecture Mismatch Discovery
+## Logstash Architecture Mismatch
 
-Confirmed that the OVA architecture differed from the assumptions in the course material.
+Discovered that the lab instructions referenced Logstash even though Logstash was not installed in the Wazuh OVA:
 
-### Commands
+![Logstash Connection Failure](assets/logstash-connection-failure.png)
+
+Commands used:
 
 ```bash
+sudo /usr/share/filebeat/bin/filebeat test output -c /home/wazuh-user/ingest.yml
 sudo systemctl status logstash
 sudo ss -lntp | grep 5044
 ```
 
-### Findings
+Observed result:
 
-- Logstash service absent
-- No listener on TCP/5044
-- Wazuh OVA was using Elasticsearch/OpenSearch directly
+```text
+dial tcp 127.0.0.1:5044: connect: connection refused
+```
 
-### Assets
+---
 
-- `assets/architecture-mismatch.png`
-- `assets/Elastic-not-logstash.png`
+## Native Filesystem Migration
+
+Data was copied from the VirtualBox shared mount into native VM storage to isolate filesystem behavior:
+
+![Native Filesystem Migration](assets/native-storage-validation.png)
+
+Commands used:
+
+```bash
+sudo find /opt/buttercup-data -type f
+sudo ls -lah /opt/buttercup-data/mailsv
+sudo ls -lah /opt/buttercup-data/vendor_sales
+sudo ls -lah /opt/buttercup-data/www1
+```
 
 ---
 
 ## Elasticsearch/OpenSearch Validation
 
-Validated active Wazuh indices and ingestion behavior.
+Confirmed that Wazuh indices existed and document counts partially increased during ingestion attempts:
 
-### Commands
+![Elasticsearch Indices](assets/elasticsearch-indices.png)
+
+Command used:
 
 ```bash
-sudo curl -k -u admin:admin \
-'https://127.0.0.1:9200/_cat/indices?v'
+sudo curl -k -u admin:admin 'https://127.0.0.1:9200/_cat/indices?v'
 ```
-
-### Findings
-
-- Indices existed
-- Wazuh alerts populated
-- Partial ingestion occurred
-
-### Assets
-
-- `assets/final-ingestion-attempt-wazuh-discovery.png`
 
 ---
 
-## Filebeat Runtime Instability
+## Filebeat Runtime Monitoring
 
-Filebeat frequently appeared alive while simultaneously failing ingestion or crashing.
+Filebeat appeared active and healthy despite ingestion inconsistency:
 
-### Commands
+![Filebeat Runtime Metrics](assets/filebeat-runtime-monitoring.png)
 
-```bash
-grep -Ei "error|harvester|publish|logstash|5044|panic|failed|events" \
-/tmp/filebeat-run.log
-```
+Observed behavior included:
 
-### Observed Behavior
+- active harvesters,
+- runtime metrics,
+- periodic monitoring updates,
+- and apparent ingestion activity.
 
-- Harvester activity persisted
-- Monitoring counters updated
-- Internal Golang panics occurred
-- Publisher/runtime failures appeared intermittently
-
-### Assets
-
-- `assets/alive-but-no-ingestion.png`
-- `assets/harvester-error.png`
-- `assets/filebeat-crash.png`
-- `assets/final-ingestion-failure.png`
+Despite this, expected dataset parity was never achieved.
 
 ---
 
-## Golang Panic / Stacktrace Failures
+## Filebeat Publisher and Pipeline Errors
 
-Repeated low-level crashes produced Golang runtime stack traces rather than clean application-layer errors.
+Publisher and module-loading warnings revealed architectural inconsistencies and internal instability:
 
-### Assets
+![Filebeat Publisher Errors](assets/filebeat-publisher-errors.png)
 
-- `assets/Go-panic-crash.png`
-- `assets/Gostacktracecrash.png`
+Command used:
+
+```bash
+grep -Ei "error|harvester|publish|logstash|5044|panic|failed|events" /tmp/filebeat-run.log
+```
+
+Observed warnings included:
+
+```text
+Filebeat is unable to load the ingest node pipelines
+Not loading modules
+runtime/cgo: pthread_create failed: Operation not permitted
+```
 
 ---
 
-## Native Storage Migration
+## Filebeat Panic / Crash Output
 
-To eliminate VirtualBox shared-folder behavior as a variable, datasets were moved into native VM storage.
+Multiple runs eventually terminated with Go runtime panic traces and unstable harvester behavior:
 
-### Commands
+![Filebeat Panic Output](assets/filebeat-panic.png)
+
+Observed symptoms included:
+
+- goroutine dumps,
+- harvester stalls,
+- channel deadlocks,
+- and abrupt termination behavior.
+
+---
+
+## System and Kernel Diagnostics
+
+System logs showed VirtualBox guest activity and filesystem interactions during testing:
+
+![Kernel and Journal Diagnostics](assets/kernel-journal-diagnostics.png)
+
+Commands used:
 
 ```bash
-sudo mkdir -p /opt/buttercup-data
-
-sudo cp -r /media/sf_buttercup-shared/* \
-/opt/buttercup-data/
-
-sudo find /opt/buttercup-data -type f
+sudo dmesg | tail -50
+sudo journalctl -xe | tail -50
 ```
 
-### Findings
+---
 
-- Stability improved somewhat
-- File readability became more consistent
-- Crashes still occurred intermittently
+## Wazuh Dashboard Behavior
 
-### Assets
+The Wazuh dashboard showed partial ingestion and increasing event counts, but not the expected complete dataset:
 
-- `assets/final-ingestion-attempt.png`
-- `assets/Filebeat-version-stablity.png`
+![Wazuh Dashboard](assets/wazuh-dashboard-results.png)
+
+This reinforced the central debugging issue:
+
+> telemetry suggested partial success while ingestion remained incomplete and unstable.
 
 ---
 
