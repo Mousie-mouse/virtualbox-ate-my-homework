@@ -9,13 +9,48 @@ This repository documents a real-world troubleshooting session involving:
 - VirtualBox shared folders
 - Linux host systems
 - Elasticsearch/OpenSearch ingestion
-- Broken Coursera lab assumptions
+- OS environment assumptions embedded into Coursera lab materials
+
 
 The original lab expected Windows-style shared folder behavior and did not account for Linux host permission handling, VirtualBox mount behavior, or Filebeat instability under these conditions.
 
 Instead of switching immediately to a Windows partition, the goal was to determine:
 
-> Was the configuration actually wrong, or was the environment itself incompatible with the assumptions made by the course?
+> Was the configuration actually wrong, or was the host machine's linux environment itself incompatible with the assumptions made by the course?
+
+---
+
+# Environment Overview
+
+The following captures show the original Coursera lab environment, Linux host workflow, dataset structure, and VirtualBox interaction model used during testing.
+
+## Coursera Lab Workflow
+
+![Coursera Lab Overview](assets/coursera-lab-overview.gif)
+
+---
+
+## Linux Host Downloads and Dataset Handling
+
+![Linux Host Downloads](assets/linux-host-downloads.gif)
+
+---
+
+## VirtualBox Shared Folder Structure
+
+![Shared Folder Structure](assets/shared-folder-structure.gif)
+
+---
+
+## Tutorial Dataset Layout
+
+![Tutorial Dataset Layout](assets/tutorial-dataset-layout.gif)
+
+---
+
+## Wazuh Runtime and Ingestion Behavior
+
+![Wazuh Runtime Behavior](assets/wazuh-runtime-behavior.gif)
 
 ---
 
@@ -375,7 +410,7 @@ sudo ls -lah /opt/buttercup-data/www1
 
 Confirmed that Wazuh indices existed and document counts partially increased during ingestion attempts:
 
-![Journal Diagnostics](assets/journal-diagnostics.png)
+![Elasticsearch Indices](assets/no-filebeat-index.png)
 
 Command used:
 
@@ -444,6 +479,7 @@ Observed symptoms included:
 System logs showed VirtualBox guest activity and filesystem interactions during testing:
 
 ![Kernel Diagnostics](assets/kernel-diagnostics.png)
+![Journal Diagnostics](assets/journal-diagnostics.png)
 
 Commands used:
 
