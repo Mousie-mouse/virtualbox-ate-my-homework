@@ -255,6 +255,8 @@ wazuh-alerts-4.x-2026.05.07
 wazuh-statistics-2026.19w
 ```
 
+![Elasticsearch Document Counts](assets/elasticsearch-document-counts.png)
+
 Document counts increased incrementally during repeated ingestion attempts.
 
 ---
@@ -495,6 +497,8 @@ sudo journalctl -xe | tail -50
 The Wazuh dashboard showed partial ingestion and increasing event counts, but not the expected complete dataset:
 
 ![Wazuh Dashboard](assets/final-ingestion-attempt-wazuh-discovery.png)
+
+![Wazuh Discover Document Counts](assets/wazuh-discover-document-counts.png)
 
 This reinforced the central debugging issue:
 
