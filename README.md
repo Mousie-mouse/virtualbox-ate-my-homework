@@ -307,9 +307,8 @@ Moving data into native VM storage improved behavior substantially.
 | Directory | Purpose |
 |-----------|---------|
 | `assets/` | Screenshots from debugging session |
-| `configs/` | Filebeat configuration examples |
 | `logs/` | Captured debug output |
-| `notes/` | Timeline and troubleshooting observations |
+
 
 ---
 
