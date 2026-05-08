@@ -324,7 +324,7 @@ It is documentation of:
 - Linux virtualization edge cases,
 - and the difference between a workaround and an actual fix.
 
-The goal is to help future Linux users avoid losing hours to undocumented assumptions inside the course environment.
+The goal is to help future Linux users avoid losing hours to undocumented assumptions inside the course environment, and to strongly advocate for Coursera to provide a warning for Linux users to use a windows partition, or provide accurate Linux walkthroughs for certification participants using Linux.
 
 ---
 
