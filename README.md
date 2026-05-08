@@ -375,7 +375,7 @@ sudo ls -lah /opt/buttercup-data/www1
 
 Confirmed that Wazuh indices existed and document counts partially increased during ingestion attempts:
 
-![Elasticsearch Indices](assets/no-filebeat-index.png)
+![Journal Diagnostics](assets/journal-diagnostics.png)
 
 Command used:
 
