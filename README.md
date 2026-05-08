@@ -16,11 +16,11 @@ The original lab expected Windows-style shared folder behavior and did not accou
 
 Instead of switching immediately to a Windows partition, the goal was to determine:
 
-> Was the configuration actually wrong, or was the host machine's linux environment itself incompatible with the assumptions made by the course?
+> Was the configuration actually wrong, or was the host machine's Linux environment itself incompatible with the assumptions made by the course?
 
 ---
 
-# Environment Overview
+## Environment Overview
 
 The following captures show the original Coursera lab environment, Linux host workflow, dataset structure, and VirtualBox interaction model used during testing.
 
@@ -54,7 +54,7 @@ The following captures show the original Coursera lab environment, Linux host wo
 
 ---
 
-# Core Problem
+## Core Problem
 
 Filebeat appeared to:
 
@@ -73,13 +73,13 @@ while simultaneously:
 The issue became significantly more complex because:
 
 - VirtualBox shared folders (`/media/sf_*`) behaved differently than native Linux paths,
-- Filebeat sometimes crashed silently,
+- Filebeat sometimes terminated without actionable logging
 - Logstash assumptions in the course materials did not match the Wazuh OVA architecture,
 - and Linux-specific filesystem behaviors were never discussed in the lab instructions.
 
 ---
 
-# What Was Investigated
+## What Was Investigated
 
 ## Shared Folder Mounts
 
@@ -245,7 +245,7 @@ sudo curl -k -u admin:admin 'https://127.0.0.1:9200/_cat/indices?v'
 This confirmed:
 
 - Wazuh indices existed,
-- document counts increased partially,
+- document counts increased partially and incrementally.
 - but expected dataset ingestion totals were never fully achieved.
 
 The primary indices observed:
@@ -255,6 +255,7 @@ wazuh-alerts-4.x-2026.05.07
 wazuh-statistics-2026.19w
 ```
 
+The assignment indicates that there should be a high document count:
 ![Elasticsearch Document Counts](assets/elasticsearch-document-counts.png)
 
 Document counts increased incrementally during repeated ingestion attempts.
@@ -301,7 +302,7 @@ Moving data into native VM storage improved behavior substantially.
 
 ---
 
-# Repository Contents
+## Repository Contents
 
 | Directory | Purpose |
 |-----------|---------|
@@ -424,7 +425,7 @@ sudo curl -k -u admin:admin 'https://127.0.0.1:9200/_cat/indices?v'
 
 ## Filebeat Runtime Monitoring
 
-Filebeat appeared active and healthy despite ingestion inconsistency:
+Filebeat appeared active and operational despite ingestion inconsistency:
 
 ![Filebeat Runtime Metrics](assets/alive-but-no-ingestion.png)
 
