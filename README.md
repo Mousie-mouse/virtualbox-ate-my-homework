@@ -479,5 +479,6 @@ This reinforced the central debugging issue:
 
 # Author
 
-**Mar Lannen** *~formerly Carter* 
-GitHub: https://github.com/Mousie-mouse
+**Mar Lannen**
+*~formerly Carter* 
+		GitHub: https://github.com/Mousie-mouse
