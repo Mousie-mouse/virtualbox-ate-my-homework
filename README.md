@@ -375,7 +375,7 @@ sudo ls -lah /opt/buttercup-data/www1
 
 Confirmed that Wazuh indices existed and document counts partially increased during ingestion attempts:
 
-![Elasticsearch Indices](assets/elasticsearch-indices.png)
+![Elasticsearch Indices](assets/no-filebeat-index.png)
 
 Command used:
 
@@ -389,7 +389,7 @@ sudo curl -k -u admin:admin 'https://127.0.0.1:9200/_cat/indices?v'
 
 Filebeat appeared active and healthy despite ingestion inconsistency:
 
-![Filebeat Runtime Metrics](assets/filebeat-runtime-monitoring.png)
+![Filebeat Runtime Metrics](assets/alive-but-no-ingestion.png)
 
 Observed behavior included:
 
@@ -406,7 +406,7 @@ Despite this, expected dataset parity was never achieved.
 
 Publisher and module-loading warnings revealed architectural inconsistencies and internal instability:
 
-![Filebeat Publisher Errors](assets/filebeat-publisher-errors.png)
+![Filebeat Publisher Errors](assets/filebeat-harvester-error.png)
 
 Command used:
 
@@ -443,7 +443,7 @@ Observed symptoms included:
 
 System logs showed VirtualBox guest activity and filesystem interactions during testing:
 
-![Kernel and Journal Diagnostics](assets/kernel-journal-diagnostics.png)
+![Kernel Diagnostics](assets/kernel-diagnostics.png)
 
 Commands used:
 
@@ -458,7 +458,7 @@ sudo journalctl -xe | tail -50
 
 The Wazuh dashboard showed partial ingestion and increasing event counts, but not the expected complete dataset:
 
-![Wazuh Dashboard](assets/wazuh-dashboard-results.png)
+![Wazuh Dashboard](assets/final-ingestion-attempt-wazuh-discovery.png)
 
 This reinforced the central debugging issue:
 
@@ -479,6 +479,5 @@ This reinforced the central debugging issue:
 
 # Author
 
-**Mar Lannen**
-*~formerly Carter* 
-		GitHub: https://github.com/Mousie-mouse
+**Mar Lannen** ~formerly Carter~ 
+GitHub: https://github.com/Mousie-mouse
